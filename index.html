@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physics Lab - Simulador Interactivo de Física 2D</title>
+  <meta name="description" content="Simulador interactivo de física en tiempo real para tiro parabólico, péndulos caóticos, colisiones 2D, órbitas gravitacionales, electrostática, termodinámica y leyes de Newton.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-badge">⚛</div>
+      <span>PHYSICS LAB</span>
+    </div>
+    
+    <div class="header-actions">
+      <!-- Opciones de Visualización -->
+      <div class="toggles-group">
+        <div class="toggle-item">
+          <span class="icon">↗</span>
+          <span>Vectores (v, F)</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleVectors" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div class="toggle-item">
+          <span class="icon">🌐</span>
+          <span>Rejilla</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleGrid" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div class="toggle-item">
+          <span class="icon">✨</span>
+          <span>Rastro</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleTrail" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Controles de Reproducción -->
+      <div class="playback-controls">
+        <button id="playBtn" class="btn-ctrl btn-primary" title="Reproducir / Pausar">⏸ PAUSAR</button>
+        <button id="stepBtn" class="btn-ctrl" title="Paso a paso">⏭</button>
+        <button id="resetBtn" class="btn-ctrl" title="Reiniciar Simulación">🔄</button>
+        <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 6px;">Velocidad:</span>
+        <input type="range" id="speedSlider" min="0.1" max="3.0" step="0.1" value="1.0" style="width: 70px;">
+        <span id="speedVal" class="val-badge">1.0x</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Layout (3 Columnas: Izquierda | Centro | Derecha) -->
+  <main class="app-container">
+    
+    <!-- Column 1: Sidebar Left (Menú de Simulaciones) -->
+    <aside class="sidebar-left">
+      <nav class="sim-menu">
+        <span class="sim-menu-title">🚀 Módulos de Física</span>
+        
+        <button class="sim-tab-btn active" data-sim="projectile">
+          <span><span class="tab-icon">🎯</span> Tiro Parabólico</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+        
+        <button class="sim-tab-btn" data-sim="newton">
+          <span><span class="tab-icon">⚖️</span> Leyes de Newton</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+        
+        <button class="sim-tab-btn" data-sim="pendulum">
+          <span><span class="tab-icon">🌀</span> Péndulo & Caos</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+        
+        <button class="sim-tab-btn" data-sim="collisions">
+          <span><span class="tab-icon">💥</span> Colisiones 2D</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+        
+        <button class="sim-tab-btn" data-sim="orbits">
+          <span><span class="tab-icon">🪐</span> Gravitación & Órbitas</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+        
+        <button class="sim-tab-btn" data-sim="electrostatics">
+          <span><span class="tab-icon">⚡</span> Electrostática</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+        
+        <button class="sim-tab-btn" data-sim="thermodynamics">
+          <span><span class="tab-icon">🔥</span> Termodinámica</span>
+          <span class="tab-arrow">➔</span>
+        </button>
+      </nav>
+
+      <nav class="sim-menu" style="margin-top: 22px;">
+        <span class="sim-menu-title">🛠️ Próximamente</span>
+        <button class="sim-tab-btn locked" disabled>
+          <span><span class="tab-icon">🌊</span> Ondas</span>
+          <span class="tab-arrow">🔒</span>
+        </button>
+        <button class="sim-tab-btn locked" disabled>
+          <span><span class="tab-icon">💧</span> Fluidos</span>
+          <span class="tab-arrow">🔒</span>
+        </button>
+        <button class="sim-tab-btn locked" disabled>
+          <span><span class="tab-icon">🔍</span> Óptica</span>
+          <span class="tab-arrow">🔒</span>
+        </button>
+        <button class="sim-tab-btn locked" disabled>
+          <span><span class="tab-icon">🔌</span> Circuitos</span>
+          <span class="tab-arrow">🔒</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Column 2: Center Viewport Canvas & Telemetry -->
+    <div class="viewport-container">
+      <canvas id="simCanvas"></canvas>
+      
+      <!-- Overlay HUD -->
+      <div class="canvas-overlay-hud">
+        <div class="hud-badge">🔬 Simulación Activa: <span id="hudSimName" class="hud-val">Tiro Parabólico</span></div>
+        <div class="hud-badge">⏱ Tiempo Real Δt: <span class="hud-val">16.6 ms</span></div>
+      </div>
+      
+      <!-- Panel Inferior: Explicación + Métricas + Telemetría de Energía -->
+      <footer class="bottom-panel">
+        
+        <!-- Cuadro de Explicación (Abajo a la Izquierda) -->
+        <div class="info-card">
+          <div>
+            <div class="info-card-header">
+              <span id="infoIcon" class="info-card-icon">🎯</span>
+              <h4 id="infoTitle" class="info-card-title">Tiro Parabólico</h4>
+            </div>
+            <p id="infoDesc" class="info-card-desc">Observa el movimiento de un proyectil bajo la fuerza de la gravedad y la resistencia del aire en tiempo real.</p>
+          </div>
+          <div id="infoFormula" class="info-card-footer">
+            <span>📐 Fórmula: y(t) = y₀ + v₀y·t - ½g·t²</span>
+          </div>
+        </div>
+        
+        <!-- Tarjetas de Métricas -->
+        <div class="telemetry-metrics">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">⏱</span>
+              <span class="metric-name">Tiempo Sim</span>
+            </div>
+            <span id="metricTime" class="metric-val">0.00 s</span>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">⚡</span>
+              <span id="labelMetricSpeed" class="metric-name">Velocidad</span>
+            </div>
+            <span id="metricSpeed" class="metric-val">0.0 m/s</span>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">📏</span>
+              <span id="labelMetricHeight" class="metric-name">Alt / Posición</span>
+            </div>
+            <span id="metricHeight" class="metric-val">0.0 m</span>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-icon">🔋</span>
+              <span class="metric-name">Energía Total</span>
+            </div>
+            <span id="metricEnergy" class="metric-val">0.0 J</span>
+          </div>
+        </div>
+        
+        <!-- Gráfico de Conservación de Energía -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <span>📈 Conservación de Energía (E_k, E_p, E_t)</span>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="dot-ek"></span> E_Cinética</span>
+              <span class="legend-item"><span class="dot-ep"></span> E_Potencial</span>
+              <span class="legend-item"><span class="dot-et"></span> E_Total</span>
+            </div>
+          </div>
+          <canvas id="chartCanvas"></canvas>
+        </div>
+        
+      </footer>
+    </div>
+
+    <!-- Column 3: Sidebar Right (Parámetros Físicos y Presets a la DERECHA) -->
+    <aside class="sidebar-right">
+      <!-- Panel de Parámetros Físicos -->
+      <section class="panel-section">
+        <h3 class="section-title"><span class="title-icon">🎛</span> Parámetros Físicos</h3>
+        <div id="dynamicControls">
+          <!-- Los controles se inyectan dinámicamente -->
+        </div>
+      </section>
+      
+      <!-- Panel de Presets -->
+      <section class="panel-section">
+        <h3 class="section-title"><span class="title-icon">🧪</span> Presets & Escenarios</h3>
+        <div id="dynamicPresets" class="presets-grid">
+          <!-- Los botones de presets se inyectan dinámicamente -->
+        </div>
+      </section>
+    </aside>
+    
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/engine.js"></script>
+  <script src="js/simulations/projectile.js"></script>
+  <script src="js/simulations/pendulum.js"></script>
+  <script src="js/simulations/collisions.js"></script>
+  <script src="js/simulations/orbits.js"></script>
+  <script src="js/simulations/electrostatics.js"></script>
+  <script src="js/simulations/thermodynamics.js"></script>
+  <script src="js/simulations/newton.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const engine = new PhysicsEngine('simCanvas', 'chartCanvas');
+      const ui = new UIController(engine);
+      engine.start();
+    });
+  </script>
+</body>
+</html>
