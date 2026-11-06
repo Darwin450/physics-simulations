@@ -70,6 +70,9 @@ class PhysicsEngine {
   resetTime() {
     this.simTime = 0;
     this.energyHistory = [];
+    if (this.activeSim && this.activeSim.useFrameTrails) {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+    }
     if (this.activeSim && this.activeSim.reset) {
       this.activeSim.reset();
     }

@@ -16,10 +16,15 @@ class UIController {
       thermodynamics: new ThermodynamicsSimulation()
     };
     
-    this.currentSimKey = 'projectile';
+    this.restoreCollisionSettings();
+    const savedSimKey = localStorage.getItem('physicsLab.activeSimulation');
+    const initialSimKey = Object.prototype.hasOwnProperty.call(this.simulations, savedSimKey)
+      ? savedSimKey
+      : 'projectile';
+    this.currentSimKey = initialSimKey;
     this.initDOM();
     this.bindEvents();
-    this.switchSimulation('projectile');
+    this.switchSimulation(initialSimKey);
     
     // Iniciar bucle de actualización de métricas UI en tiempo real
     setInterval(() => this.updateTelemetry(), 80);
@@ -102,8 +107,16 @@ class UIController {
   }
   
   switchSimulation(simKey) {
+    if (!Object.prototype.hasOwnProperty.call(this.simulations, simKey)) {
+      simKey = 'projectile';
+    }
+
     this.currentSimKey = simKey;
     const sim = this.simulations[simKey];
+    localStorage.setItem('physicsLab.activeSimulation', simKey);
+    document.querySelectorAll('.sim-tab-btn[data-sim]').forEach((button) => {
+      button.classList.toggle('active', button.dataset.sim === simKey);
+    });
     this.collisionMomentumHud.hidden = simKey !== 'collisions';
     
     // Asignar simulación al motor y reiniciar la historia de telemetría
@@ -156,10 +169,10 @@ class UIController {
       this.addPreset('🌀 Péndulo Doble (Caos)', () => { sim.mode = 'double'; sim.reset(); });
       this.addPreset('📐 Péndulo Simple', () => { sim.mode = 'simple'; sim.reset(); });
     } else if (simKey === 'collisions') {
-      this.addSlider('Masa 1 (m₁)', 0.5, 10, sim.mass1, 'kg', (v) => { sim.mass1 = v; this.engine.resetTime(); });
-      this.addSlider('Velocidad 1 (v₁)', -8, 8, sim.velocity1, 'm/s', (v) => { sim.velocity1 = v; this.engine.resetTime(); });
-      this.addSlider('Masa 2 (m₂)', 0.5, 10, sim.mass2, 'kg', (v) => { sim.mass2 = v; this.engine.resetTime(); });
-      this.addSlider('Velocidad 2 (v₂)', -8, 8, sim.velocity2, 'm/s', (v) => { sim.velocity2 = v; this.engine.resetTime(); });
+      this.addSlider('Masa 1 (m₁)', 0.5, 10, sim.mass1, 'kg', (v) => { sim.mass1 = v; this.engine.resetTime(); this.persistCollisionSettings(); });
+      this.addSlider('Velocidad 1 (v₁)', -8, 8, sim.velocity1, 'm/s', (v) => { sim.velocity1 = v; this.engine.resetTime(); this.persistCollisionSettings(); });
+      this.addSlider('Masa 2 (m₂)', 0.5, 10, sim.mass2, 'kg', (v) => { sim.mass2 = v; this.engine.resetTime(); this.persistCollisionSettings(); });
+      this.addSlider('Velocidad 2 (v₂)', -8, 8, sim.velocity2, 'm/s', (v) => { sim.velocity2 = v; this.engine.resetTime(); this.persistCollisionSettings(); });
 
       this.addPreset('⚖️ Masas iguales', () => {
         sim.mass1 = 2;
@@ -167,6 +180,7 @@ class UIController {
         sim.velocity1 = 4;
         sim.velocity2 = -2;
         this.engine.resetTime();
+        this.persistCollisionSettings();
         this.renderControls(simKey);
       });
       this.addPreset('🧱 Objeto pesado', () => {
@@ -175,6 +189,7 @@ class UIController {
         sim.velocity1 = 6;
         sim.velocity2 = 0;
         this.engine.resetTime();
+        this.persistCollisionSettings();
         this.renderControls(simKey);
       });
     } else if (simKey === 'orbits') {
@@ -185,11 +200,11 @@ class UIController {
       this.addPreset('⚡ Dipolo Eléctrico', () => sim.reset());
     } else if (simKey === 'thermodynamics') {
       this.addSlider('Temperatura (T)', -100, 500, sim.T, '°C', (v) => sim.T = v);
-      
+
       if (sim.mode === 'rod') {
         this.addSlider('Longitud Inicial (L₀)', 2, 20, sim.L0, 'm', (v) => sim.L0 = v);
       }
-      
+
       this.addPreset('🔓 Sistema Abierto', () => { sim.mode = 'open_system'; sim.reset(); this.updateInfoCard(simKey); });
       this.addPreset('🔒 Sistema Cerrado', () => { sim.mode = 'closed_system'; sim.reset(); this.updateInfoCard(simKey); });
       this.addPreset('🛡️ Sistema Aislado', () => { sim.mode = 'isolated_system'; sim.reset(); this.updateInfoCard(simKey); });
@@ -197,6 +212,49 @@ class UIController {
       this.addPreset('🌗 Lámina Bimetálica', () => { sim.mode = 'bimetallic'; sim.reset(); this.renderControls(simKey); });
       this.addPreset('💨 Pistón Gas Ideal', () => { sim.mode = 'gas'; sim.reset(); this.renderControls(simKey); });
     }
+  }
+
+  restoreCollisionSettings() {
+    const saved = localStorage.getItem('physicsLab.collisionSettings');
+    if (!saved) return;
+
+    const settings = JSON.parse(saved);
+    if (!settings || typeof settings !== 'object') {
+      console.warn('Se omitieron los ajustes guardados de colisiones no válidos.');
+      return;
+    }
+
+    const bounds = {
+      mass1: [0.5, 10],
+      velocity1: [-8, 8],
+      mass2: [0.5, 10],
+      velocity2: [-8, 8]
+    };
+
+    for (const [key, [min, max]] of Object.entries(bounds)) {
+      const value = settings[key];
+      if (!Number.isFinite(value) || value < min || value > max) {
+        console.warn(`Se omitió el valor guardado no válido de ${key}.`);
+        return;
+      }
+    }
+
+    const simulation = this.simulations.collisions;
+    simulation.mass1 = settings.mass1;
+    simulation.velocity1 = settings.velocity1;
+    simulation.mass2 = settings.mass2;
+    simulation.velocity2 = settings.velocity2;
+    simulation.reset();
+  }
+
+  persistCollisionSettings() {
+    const { mass1, velocity1, mass2, velocity2 } = this.simulations.collisions;
+    localStorage.setItem('physicsLab.collisionSettings', JSON.stringify({
+      mass1,
+      velocity1,
+      mass2,
+      velocity2
+    }));
   }
   
   addSlider(label, min, max, val, unit, onChange) {
@@ -281,7 +339,7 @@ class UIController {
       info = {
         icon: "💥",
         title: "Choques Elásticos 1D",
-        desc: "Modifica las masas y velocidades iniciales. En el choque elástico se conservan el momento lineal total y la energía cinética.",
+        desc: "Con masas iguales verás dos carritos; al elegir masas diferentes, un carrito y una motocicleta. Ajusta sus masas y velocidades para comparar el choque elástico.",
         formula: "📐 v₁' = ((m₁−m₂)v₁ + 2m₂v₂)/(m₁+m₂)  |  v₂' = (2m₁v₁ + (m₂−m₁)v₂)/(m₁+m₂)"
       };
     } else if (simKey === 'orbits') {

@@ -49,7 +49,8 @@ Para añadir una nueva, sigue este patrón:
 
 ## Choques elásticos 1D
 
-El módulo permite ajustar las masas y velocidades iniciales de dos esferas.
-Al colisionar, calcula las velocidades finales con las ecuaciones de un choque
-elástico unidimensional y muestra el momento total antes y después del impacto.
-La energía cinética también se registra en el gráfico del motor.
+El módulo permite ajustar las masas y velocidades iniciales de dos vehículos.
+Si las masas son iguales, se muestran dos carritos; si son distintas, un carrito
+y una motocicleta. Al colisionar, calcula las velocidades finales con las
+ecuaciones de un choque elástico unidimensional y muestra el momento total antes
+y después del impacto. La energía cinética también se registra en el gráfico.
