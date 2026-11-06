@@ -15,8 +15,8 @@ class PhysicsEngine {
     this.lastFrameTime = performance.now();
     
     // Configuración de renderizado / Cámara
-    this.scale = 20; // 20 píxeles por metro por defecto
-    this.originX = 80; // Píxeles desde la izquierda
+    this.scale = 30; // más grande para mejorar legibilidad y sensación 3D
+    this.originX = 120; // Píxeles desde la izquierda
     this.originY = 0;  // Se recalcula con el alto
     
     // Toggles de visualización
@@ -46,7 +46,7 @@ class PhysicsEngine {
     this.width = rect.width;
     this.height = rect.height;
     
-    this.originY = this.height - 60;
+    this.originY = Math.max(this.height - 60, 140);
     
     if (this.chartCanvas) {
       const chartRect = this.chartCanvas.parentElement.getBoundingClientRect();
@@ -127,6 +127,7 @@ class PhysicsEngine {
   
   render() {
     this.ctx.clearRect(0, 0, this.width, this.height);
+    this.drawBackground();
     
     if (this.showGrid) {
       this.drawGrid();
@@ -137,6 +138,61 @@ class PhysicsEngine {
     }
     
     this.drawChart();
+  }
+
+  drawBackground() {
+    const ctx = this.ctx;
+    const background = ctx.createLinearGradient(0, 0, 0, this.height);
+    background.addColorStop(0, '#08141d');
+    background.addColorStop(0.45, '#0b1320');
+    background.addColorStop(1, '#04080d');
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    const glow = ctx.createRadialGradient(
+      this.width * 0.5,
+      this.height * 0.35,
+      10,
+      this.width * 0.5,
+      this.height * 0.35,
+      this.width * 0.7
+    );
+    glow.addColorStop(0, 'rgba(0, 243, 255, 0.15)');
+    glow.addColorStop(0.35, 'rgba(157, 78, 221, 0.10)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, this.width, this.height);
+  }
+
+  drawShadow(x, y, radius = 12, color = 'rgba(0, 0, 0, 0.35)') {
+    const ctx = this.ctx;
+    const px = this.toScreenX(x);
+    const py = this.toScreenY(y);
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.ellipse(px, py + radius * 0.9, radius * 1.5, radius * 0.65, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  drawOrb(x, y, radius, color, glowColor = color) {
+    const ctx = this.ctx;
+    const px = this.toScreenX(x);
+    const py = this.toScreenY(y);
+    const gradient = ctx.createRadialGradient(px - radius * 0.35, py - radius * 0.5, radius * 0.2, px, py, radius * 1.5);
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(0.25, glowColor);
+    gradient.addColorStop(1, color);
+
+    ctx.save();
+    ctx.fillStyle = gradient;
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.arc(px, py, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
   
   toScreenX(x) {
@@ -158,7 +214,7 @@ class PhysicsEngine {
   drawGrid() {
     const ctx = this.ctx;
     ctx.save();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 1;
     
     const stepMeters = 5;
@@ -178,7 +234,7 @@ class PhysicsEngine {
       ctx.stroke();
     }
     
-    ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+    ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, this.originY);
@@ -206,7 +262,8 @@ class PhysicsEngine {
     ctx.save();
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
     
     ctx.beginPath();
     ctx.moveTo(startX, startY);
@@ -214,7 +271,7 @@ class PhysicsEngine {
     ctx.stroke();
     
     const angle = Math.atan2(dy, dx);
-    const headLen = 8;
+    const headLen = 10;
     ctx.beginPath();
     ctx.moveTo(endX, endY);
     ctx.lineTo(endX - headLen * Math.cos(angle - Math.PI / 6), endY - headLen * Math.sin(angle - Math.PI / 6));
@@ -223,8 +280,8 @@ class PhysicsEngine {
     ctx.fill();
     
     if (label) {
-      ctx.font = '11px Space Grotesk';
-      ctx.fillText(label, endX + 6, endY - 6);
+      ctx.font = '12px Space Grotesk';
+      ctx.fillText(label, endX + 8, endY - 8);
     }
     
     ctx.restore();
@@ -246,6 +303,8 @@ class PhysicsEngine {
     const h = this.chartHeight;
     
     ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(11, 17, 26, 0.6)';
+    ctx.fillRect(0, 0, w, h);
     
     if (this.energyHistory.length < 2) return;
     
@@ -260,7 +319,9 @@ class PhysicsEngine {
     const drawLine = (key, color) => {
       ctx.beginPath();
       ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
       for (let i = 0; i < this.energyHistory.length; i++) {
         const p = this.energyHistory[i];
         const x = (i / (this.maxHistoryLength - 1)) * w;
@@ -269,6 +330,7 @@ class PhysicsEngine {
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
+      ctx.shadowBlur = 0;
     };
     
     drawLine('ep', '#9d4edd');

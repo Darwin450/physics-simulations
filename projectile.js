@@ -71,19 +71,25 @@ class ProjectileSimulation {
   
   draw(engine) {
     const ctx = engine.ctx;
-    
+    const groundY = engine.toScreenY(0);
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.18)';
+    ctx.fillRect(0, groundY - 6, engine.width, 8);
+    ctx.restore();
+
     // Dibujar Diana en la distancia
     const targetPx = engine.toScreenX(this.targetDist);
-    const groundPy = engine.toScreenY(0);
     
     ctx.save();
+    engine.drawShadow(this.targetDist, 0, 16, 'rgba(255, 0, 127, 0.25)');
     ctx.fillStyle = 'rgba(255, 0, 127, 0.4)';
     ctx.beginPath();
-    ctx.arc(targetPx, groundPy - 10, 16, 0, Math.PI * 2);
+    ctx.arc(targetPx, groundY - 10, 16, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = '#ff007f';
     ctx.beginPath();
-    ctx.arc(targetPx, groundPy - 10, 8, 0, Math.PI * 2);
+    ctx.arc(targetPx, groundY - 10, 8, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     
@@ -91,8 +97,8 @@ class ProjectileSimulation {
     if (engine.showTrail && this.trail.length > 1) {
       ctx.save();
       ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 2.2;
+      ctx.setLineDash([5, 5]);
       ctx.beginPath();
       for (let i = 0; i < this.trail.length; i++) {
         const px = engine.toScreenX(this.trail[i].x);
@@ -110,22 +116,18 @@ class ProjectileSimulation {
     ctx.save();
     ctx.translate(cannonPx, cannonPy);
     ctx.rotate((-this.angle * Math.PI) / 180);
-    ctx.fillStyle = '#64748b';
-    ctx.fillRect(0, -6, 24, 12);
+    const cannonGradient = ctx.createLinearGradient(0, -6, 26, 0);
+    cannonGradient.addColorStop(0, '#cbd5e1');
+    cannonGradient.addColorStop(1, '#64748b');
+    ctx.fillStyle = cannonGradient;
+    ctx.fillRect(0, -6, 28, 12);
     ctx.restore();
     
     // Dibujar Proyectil
     const px = engine.toScreenX(this.x);
     const py = engine.toScreenY(this.y);
-    
-    ctx.save();
-    ctx.fillStyle = '#00f3ff';
-    ctx.shadowColor = '#00f3ff';
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(px, py, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    engine.drawShadow(this.x, this.y, 10, 'rgba(0, 0, 0, 0.42)');
+    engine.drawOrb(this.x, this.y, 9, '#00f3ff', '#7dd3fc');
     
     // Dibujar Vectores
     if (engine.showVectors && !this.isLanded) {

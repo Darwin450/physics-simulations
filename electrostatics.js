@@ -83,9 +83,13 @@ class ElectrostaticsSimulation {
       const py = engine.toScreenY(c.y);
       
       ctx.save();
-      ctx.fillStyle = c.color;
+      const chargeGradient = ctx.createRadialGradient(px - 5, py - 5, 2, px, py, 18);
+      chargeGradient.addColorStop(0, '#ffffff');
+      chargeGradient.addColorStop(0.3, c.color);
+      chargeGradient.addColorStop(1, c.color);
+      ctx.fillStyle = chargeGradient;
       ctx.shadowColor = c.color;
-      ctx.shadowBlur = 18;
+      ctx.shadowBlur = 20;
       ctx.beginPath();
       ctx.arc(px, py, 14, 0, Math.PI * 2);
       ctx.fill();
@@ -103,7 +107,7 @@ class ElectrostaticsSimulation {
     if (engine.showTrail && tp.trail.length > 1) {
       ctx.save();
       ctx.strokeStyle = '#00ff9d';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.2;
       ctx.beginPath();
       for (let i = 0; i < tp.trail.length; i++) {
         const px = engine.toScreenX(tp.trail[i].x);
@@ -115,12 +119,17 @@ class ElectrostaticsSimulation {
       ctx.restore();
     }
     
+    engine.drawShadow(tp.x, tp.y, 12, 'rgba(0, 255, 157, 0.22)');
     const tPx = engine.toScreenX(tp.x);
     const tPy = engine.toScreenY(tp.y);
     ctx.save();
-    ctx.fillStyle = '#00ff9d';
+    const particleGradient = ctx.createRadialGradient(tPx - 2, tPy - 2, 1, tPx, tPy, 10);
+    particleGradient.addColorStop(0, '#ffffff');
+    particleGradient.addColorStop(0.4, '#00ff9d');
+    particleGradient.addColorStop(1, '#0ea5e9');
+    ctx.fillStyle = particleGradient;
     ctx.shadowColor = '#00ff9d';
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.arc(tPx, tPy, 6, 0, Math.PI * 2);
     ctx.fill();

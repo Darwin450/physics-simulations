@@ -53,9 +53,13 @@ class OrbitsSimulation {
     const starPr = this.star.r * engine.scale;
     
     ctx.save();
-    ctx.fillStyle = this.star.color;
-    ctx.shadowColor = this.star.color;
-    ctx.shadowBlur = 25;
+    const sunGradient = ctx.createRadialGradient(starPx - starPr * 0.3, starPy - starPr * 0.4, starPr * 0.2, starPx, starPy, starPr * 1.4);
+    sunGradient.addColorStop(0, '#fff5c4');
+    sunGradient.addColorStop(0.2, '#ffd166');
+    sunGradient.addColorStop(1, '#f59e0b');
+    ctx.fillStyle = sunGradient;
+    ctx.shadowColor = '#ffd166';
+    ctx.shadowBlur = 30;
     ctx.beginPath();
     ctx.arc(starPx, starPy, starPr, 0, Math.PI * 2);
     ctx.fill();
@@ -68,7 +72,7 @@ class OrbitsSimulation {
       if (engine.showTrail && p.trail.length > 1) {
         ctx.save();
         ctx.strokeStyle = p.color;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
         for (let i = 0; i < p.trail.length; i++) {
           const px = engine.toScreenX(p.trail[i].x);
@@ -84,10 +88,16 @@ class OrbitsSimulation {
       const py = engine.toScreenY(p.y);
       const pr = p.r * engine.scale;
       
+      engine.drawShadow(p.x, p.y, pr * 0.65, 'rgba(0, 0, 0, 0.28)');
+
       ctx.save();
-      ctx.fillStyle = p.color;
+      const planetGradient = ctx.createRadialGradient(px - pr * 0.35, py - pr * 0.45, 1, px, py, pr + 4);
+      planetGradient.addColorStop(0, '#ffffff');
+      planetGradient.addColorStop(0.3, p.color);
+      planetGradient.addColorStop(1, p.color);
+      ctx.fillStyle = planetGradient;
       ctx.shadowColor = p.color;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 12;
       ctx.beginPath();
       ctx.arc(px, py, pr, 0, Math.PI * 2);
       ctx.fill();

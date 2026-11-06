@@ -104,7 +104,7 @@ class PendulumSimulation {
         
         const alpha = i / this.trail.length;
         ctx.strokeStyle = `rgba(0, 243, 255, ${alpha * 0.7})`;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.2;
         ctx.beginPath();
         ctx.moveTo(px1, py1);
         ctx.lineTo(px2, py2);
@@ -113,7 +113,6 @@ class PendulumSimulation {
       ctx.restore();
     }
     
-    // Varilla 1
     ctx.save();
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.lineWidth = 3;
@@ -121,31 +120,42 @@ class PendulumSimulation {
     ctx.moveTo(pivotX, pivotY);
     ctx.lineTo(x1, y1);
     ctx.stroke();
+
+    engine.drawShadow(this.l1 * Math.sin(this.a1), -this.l1 * Math.cos(this.a1), 16, 'rgba(0,0,0,0.28)');
     
     // Masa 1
-    ctx.fillStyle = '#9d4edd';
+    const mass1Gradient = ctx.createRadialGradient(x1 - 4, y1 - 6, 2, x1, y1, 16);
+    mass1Gradient.addColorStop(0, '#f5d0fe');
+    mass1Gradient.addColorStop(0.55, '#9d4edd');
+    mass1Gradient.addColorStop(1, '#4c1d95');
+    ctx.fillStyle = mass1Gradient;
+    ctx.shadowColor = '#9d4edd';
+    ctx.shadowBlur = 18;
     ctx.beginPath();
     ctx.arc(x1, y1, 12, 0, Math.PI * 2);
     ctx.fill();
     
     if (this.mode === 'double') {
-      // Varilla 2
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
       ctx.stroke();
       
-      // Masa 2
-      ctx.fillStyle = '#00f3ff';
+      const mass2Gradient = ctx.createRadialGradient(x2 - 3, y2 - 4, 2, x2, y2, 14);
+      mass2Gradient.addColorStop(0, '#dff9ff');
+      mass2Gradient.addColorStop(0.5, '#00f3ff');
+      mass2Gradient.addColorStop(1, '#0891b2');
+      ctx.fillStyle = mass2Gradient;
       ctx.shadowColor = '#00f3ff';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 15;
       ctx.beginPath();
       ctx.arc(x2, y2, 10, 0, Math.PI * 2);
       ctx.fill();
     }
     
-    // Pivote
     ctx.fillStyle = '#ff6b35';
+    ctx.shadowColor = '#ff6b35';
+    ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.arc(pivotX, pivotY, 6, 0, Math.PI * 2);
     ctx.fill();

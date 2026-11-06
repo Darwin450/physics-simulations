@@ -215,7 +215,7 @@ body {
   padding: 12px 14px;
   border-radius: var(--radius-md);
   font-family: var(--font-main);
-  font-size: 0.88rem;
+  font-size: 0.96rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -457,9 +457,9 @@ canvas#simCanvas {
   background: rgba(7, 9, 14, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-glow);
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 24px;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   font-family: var(--font-code);
   display: flex;
@@ -475,14 +475,14 @@ canvas#simCanvas {
 
 /* Bottom Telemetry & Info Dashboard */
 .bottom-panel {
-  height: 220px;
+  height: 240px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border-color);
   display: grid;
-  grid-template-columns: 320px 300px 1fr;
-  padding: 14px 20px;
-  gap: 16px;
+  grid-template-columns: 360px 340px 1fr;
+  padding: 16px 20px;
+  gap: 18px;
   z-index: 10;
   box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.4);
 }
@@ -492,7 +492,7 @@ canvas#simCanvas {
   border: 1px solid var(--border-color);
   border-left: 4px solid var(--accent-cyan);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -506,33 +506,33 @@ canvas#simCanvas {
 }
 
 .info-card-icon {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 }
 
 .info-card-title {
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--accent-cyan);
 }
 
 .info-card-desc {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.4;
-  margin-top: 4px;
+  line-height: 1.5;
+  margin-top: 6px;
 }
 
 .info-card-footer {
   font-family: var(--font-code);
-  font-size: 0.73rem;
+  font-size: 0.8rem;
   color: var(--accent-purple);
   background: rgba(157, 78, 221, 0.12);
-  padding: 5px 8px;
+  padding: 6px 9px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .telemetry-metrics {
@@ -562,7 +562,7 @@ canvas#simCanvas {
 }
 
 .metric-name {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -571,10 +571,10 @@ canvas#simCanvas {
 
 .metric-val {
   font-family: var(--font-code);
-  font-size: 1.05rem;
+  font-size: 1.18rem;
   font-weight: 700;
   color: var(--accent-cyan);
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .chart-container {
@@ -591,7 +591,7 @@ canvas#simCanvas {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
   font-weight: 600;
   margin-bottom: 6px;
@@ -606,7 +606,7 @@ canvas#simCanvas {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
 }
 
 .dot-ek { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); }
