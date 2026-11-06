@@ -41,6 +41,9 @@ class UIController {
     
     // Elementos del HUD y del Cuadro de Explicación Inferior
     this.hudSimName = document.getElementById('hudSimName');
+    this.collisionMomentumHud = document.getElementById('collisionMomentumHud');
+    this.collisionMomentumValue = document.getElementById('collisionMomentumValue');
+    this.collisionMomentumDetails = document.getElementById('collisionMomentumDetails');
     this.infoIcon = document.getElementById('infoIcon');
     this.infoTitle = document.getElementById('infoTitle');
     this.infoDesc = document.getElementById('infoDesc');
@@ -101,6 +104,7 @@ class UIController {
   switchSimulation(simKey) {
     this.currentSimKey = simKey;
     const sim = this.simulations[simKey];
+    this.collisionMomentumHud.hidden = simKey !== 'collisions';
     
     // Asignar simulación al motor y reiniciar la historia de telemetría
     this.engine.setSimulation(sim);
@@ -152,10 +156,27 @@ class UIController {
       this.addPreset('🌀 Péndulo Doble (Caos)', () => { sim.mode = 'double'; sim.reset(); });
       this.addPreset('📐 Péndulo Simple', () => { sim.mode = 'simple'; sim.reset(); });
     } else if (simKey === 'collisions') {
-      this.addSlider('Coeficiente Restitución (e)', 0, 1, sim.restitution, '', (v) => sim.restitution = v);
-      
-      this.addPreset('💎 Totalmente Elástica', () => { sim.restitution = 1.0; sim.reset(); });
-      this.addPreset('🛑 Inelástica (e=0.3)', () => { sim.restitution = 0.3; sim.reset(); });
+      this.addSlider('Masa 1 (m₁)', 0.5, 10, sim.mass1, 'kg', (v) => { sim.mass1 = v; this.engine.resetTime(); });
+      this.addSlider('Velocidad 1 (v₁)', -8, 8, sim.velocity1, 'm/s', (v) => { sim.velocity1 = v; this.engine.resetTime(); });
+      this.addSlider('Masa 2 (m₂)', 0.5, 10, sim.mass2, 'kg', (v) => { sim.mass2 = v; this.engine.resetTime(); });
+      this.addSlider('Velocidad 2 (v₂)', -8, 8, sim.velocity2, 'm/s', (v) => { sim.velocity2 = v; this.engine.resetTime(); });
+
+      this.addPreset('⚖️ Masas iguales', () => {
+        sim.mass1 = 2;
+        sim.mass2 = 2;
+        sim.velocity1 = 4;
+        sim.velocity2 = -2;
+        this.engine.resetTime();
+        this.renderControls(simKey);
+      });
+      this.addPreset('🧱 Objeto pesado', () => {
+        sim.mass1 = 1;
+        sim.mass2 = 6;
+        sim.velocity1 = 6;
+        sim.velocity2 = 0;
+        this.engine.resetTime();
+        this.renderControls(simKey);
+      });
     } else if (simKey === 'orbits') {
       this.addSlider('Masa Solar', 200, 3000, sim.star.m, 'kg', (v) => sim.star.m = v);
       this.addPreset('🪐 Sistema Solar', () => sim.reset());
@@ -259,9 +280,9 @@ class UIController {
     } else if (simKey === 'collisions') {
       info = {
         icon: "💥",
-        title: "Colisiones 2D",
-        desc: "Analiza el choque entre partículas en 2D, comprobando la conservación del momento lineal P = m·v y el coeficiente e.",
-        formula: "📐 Momento: P_total = m₁v₁ + m₂v₂  |  e = (v₂' - v₁') / (v₁ - v₂)"
+        title: "Choques Elásticos 1D",
+        desc: "Modifica las masas y velocidades iniciales. En el choque elástico se conservan el momento lineal total y la energía cinética.",
+        formula: "📐 v₁' = ((m₁−m₂)v₁ + 2m₂v₂)/(m₁+m₂)  |  v₂' = (2m₁v₁ + (m₂−m₁)v₂)/(m₁+m₂)"
       };
     } else if (simKey === 'orbits') {
       info = {
@@ -328,6 +349,9 @@ class UIController {
     } else if (simKey === 'pendulum') {
       this.labelMetricSpeed.textContent = "Velocidad Ang. ω";
       this.labelMetricHeight.textContent = "Ángulo θ";
+    } else if (simKey === 'collisions') {
+      this.labelMetricSpeed.textContent = "Velocidades";
+      this.labelMetricHeight.textContent = "Momento total";
     } else {
       this.labelMetricSpeed.textContent = "Velocidad";
       this.labelMetricHeight.textContent = "Alt. Máxima";
@@ -353,6 +377,15 @@ class UIController {
     } else if (this.currentSimKey === 'pendulum' && sim) {
       this.metricSpeed.textContent = `${sim.v1.toFixed(2)} rad/s`;
       this.metricHeight.textContent = `${(sim.a1 * 180 / Math.PI).toFixed(1)}°`;
+    } else if (this.currentSimKey === 'collisions' && sim) {
+      const [ball1, ball2] = sim.particles;
+      const momentum = ball1.m * ball1.vx + ball2.m * ball2.vx;
+      this.metricSpeed.textContent = `${ball1.vx.toFixed(1)} / ${ball2.vx.toFixed(1)} m/s`;
+      this.metricHeight.textContent = `${momentum.toFixed(2)} kg·m/s`;
+      this.collisionMomentumValue.textContent = `p = ${momentum.toFixed(2)} kg·m/s`;
+      this.collisionMomentumDetails.textContent = sim.collided
+        ? `Antes: ${sim.momentumBeforeCollision.toFixed(2)} · Después: ${sim.momentumAfterCollision.toFixed(2)} kg·m/s | ΔEₖ: ${sim.energyError.toExponential(1)} J`
+        : 'Esperando el choque…';
     } else if (this.currentSimKey === 'thermodynamics' && sim) {
       this.metricSpeed.textContent = `${sim.T.toFixed(0)} °C`;
       if (sim.mode.includes('system')) {

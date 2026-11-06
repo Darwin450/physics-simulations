@@ -489,6 +489,44 @@ canvas#simCanvas {
   font-weight: 700;
 }
 
+.collision-momentum {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 6;
+  width: min(340px, calc(100% - 36px));
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 243, 255, 0.45);
+  border-radius: var(--radius-lg);
+  background: rgba(7, 9, 14, 0.84);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), 0 0 24px rgba(0, 243, 255, 0.08);
+  pointer-events: none;
+}
+
+.collision-momentum[hidden] {
+  display: none;
+}
+
+.collision-momentum h3 {
+  color: var(--accent-cyan);
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.collision-momentum p {
+  margin-top: 8px;
+  color: var(--text-primary);
+  font: 600 1rem var(--font-code);
+}
+
+.collision-momentum .collision-momentum-details {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 /* Bottom Telemetry & Info Dashboard */
 .bottom-panel {
   height: 240px;

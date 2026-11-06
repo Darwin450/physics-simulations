@@ -63,6 +63,7 @@ class PhysicsEngine {
   
   setSimulation(simInstance) {
     this.activeSim = simInstance;
+    this.ctx.clearRect(0, 0, this.width, this.height);
     this.resetTime();
   }
   
@@ -126,8 +127,13 @@ class PhysicsEngine {
   }
   
   render() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.drawBackground();
+    if (this.activeSim && this.activeSim.useFrameTrails) {
+      this.ctx.fillStyle = 'rgba(4, 6, 11, 0.14)';
+      this.ctx.fillRect(0, 0, this.width, this.height);
+    } else {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      this.drawBackground();
+    }
     
     if (this.showGrid) {
       this.drawGrid();

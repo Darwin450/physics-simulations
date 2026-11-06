@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Physics Lab - Simulador Interactivo de Física 2D</title>
-  <meta name="description" content="Simulador interactivo de física en tiempo real para tiro parabólico, péndulos caóticos, colisiones 2D, órbitas gravitacionales, electrostática, termodinámica y leyes de Newton.">
+  <meta name="description" content="Simulador interactivo de física en tiempo real para tiro parabólico, péndulos caóticos, choques elásticos 1D, órbitas gravitacionales, electrostática, termodinámica y leyes de Newton.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -29,7 +29,7 @@
         </div>
         
         <div class="toggle-item">
-          <span class="icon">🌐</span>
+          <span class="icon">🧩</span>
           <span>Rejilla</span>
           <label class="switch">
             <input type="checkbox" id="toggleGrid" checked>
@@ -83,7 +83,7 @@
         </button>
         
         <button class="sim-tab-btn" data-sim="collisions">
-          <span><span class="tab-icon">💥</span> Colisiones 2D</span>
+          <span><span class="tab-icon">💥</span> Choques Elásticos</span>
           <span class="tab-arrow">➔</span>
         </button>
         
@@ -133,6 +133,11 @@
         <div class="hud-badge">🔬 Simulación Activa: <span id="hudSimName" class="hud-val">Tiro Parabólico</span></div>
         <div class="hud-badge">⏱ Tiempo Real Δt: <span class="hud-val">16.6 ms</span></div>
       </div>
+      <section id="collisionMomentumHud" class="collision-momentum" aria-live="polite" hidden>
+        <h3>Momento lineal total</h3>
+        <p id="collisionMomentumValue">p = 0.00 kg·m/s</p>
+        <p id="collisionMomentumDetails" class="collision-momentum-details">Esperando el choque…</p>
+      </section>
       
       <!-- Panel Inferior: Explicación + Métricas + Telemetría de Energía -->
       <footer class="bottom-panel">

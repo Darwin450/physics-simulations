@@ -1,7 +1,7 @@
 # Physics Lab
 
-Proyecto de simulación interactiva de física 2D con módulos para tiro parabólico,
-leyes de Newton, péndulo y caos, colisiones 2D, gravitación y órbitas,
+Proyecto de simulación interactiva de física con módulos para tiro parabólico,
+leyes de Newton, péndulo y caos, choques elásticos 1D, gravitación y órbitas,
 electrostática y termodinámica.
 
 ## Estructura del proyecto
@@ -47,9 +47,9 @@ Para añadir una nueva, sigue este patrón:
 3. Registra la simulación en `UIController` dentro de `js/ui.js`.
 4. Añade su configuración visual y sus textos de ayuda.
 
-## Mejora incluida en esta revisión
+## Choques elásticos 1D
 
-- Se normalizó la estructura de carpetas para que coincida con la referencia del `index.html`.
-- Se añadió la simulación faltante de colisiones 2D.
-- Se documentó la estructura del proyecto y la forma de ejecutarlo.
-- Se dejó la base lista para seguir ampliando módulos con una organización consistente.
+El módulo permite ajustar las masas y velocidades iniciales de dos esferas.
+Al colisionar, calcula las velocidades finales con las ecuaciones de un choque
+elástico unidimensional y muestra el momento total antes y después del impacto.
+La energía cinética también se registra en el gráfico del motor.
