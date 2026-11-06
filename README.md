@@ -1,44 +1,55 @@
-# Laboratorio de Física Interactivo
+# Physics Lab
 
-Simulador 2D con 7 módulos: tiro parabólico, leyes de Newton, péndulo y caos,
-colisiones 2D, gravitación y órbitas, electrostática, y termodinámica
-(incluye sistemas abiertos, cerrados y aislados).
+Proyecto de simulación interactiva de física 2D con módulos para tiro parabólico,
+leyes de Newton, péndulo y caos, colisiones 2D, gravitación y órbitas,
+electrostática y termodinámica.
 
-## Publicarlo en GitHub Pages
+## Estructura del proyecto
 
-1. Crea un repositorio nuevo y público en GitHub (por ejemplo `laboratorio-fisica`).
-2. Sube **todo el contenido de esta carpeta** manteniendo la estructura:
-   ```
-   index.html
-   styles.css
-   js/engine.js
-   js/ui.js
-   js/simulations/*.js
-   ```
-   (arrástralos todos juntos con "Add file" → "Upload files", conservando las
-   subcarpetas `js/` y `js/simulations/`).
-3. Ve a **Settings → Pages**, elige la rama `main` y la carpeta `/ (root)`, guarda.
-4. En un minuto tendrás tu enlace público: `tu-usuario.github.io/laboratorio-fisica`.
+```text
+.
+├── index.html
+├── styles.css
+├── js/
+│   ├── engine.js
+│   ├── ui.js
+│   └── simulations/
+│       ├── collisions.js
+│       ├── electrostatics.js
+│       ├── newton.js
+│       ├── orbits.js
+│       ├── pendulum.js
+│       ├── projectile.js
+│       └── thermodynamics.js
+├── LICENSE
+└── README.md
+```
 
-Como `index.html` ya está en la raíz, no hace falta renombrar nada esta vez.
+## Cómo ejecutarlo
 
-## Cómo seguir ampliándolo
+1. Abre la carpeta del proyecto en tu navegador.
+2. Carga `index.html` directamente en el navegador o usa un servidor local simple.
+3. Si prefieres un servidor local:
 
-Cada simulación vive en su propio archivo dentro de `js/simulations/`. Para
-agregar un módulo nuevo (ej. Ondas):
+```bash
+python -m http.server 8000
+```
 
-1. Crea `js/simulations/waves.js` con una clase `WavesSimulation` que tenga
-   `reset()`, `update(dt)` y `draw(engine)` (copia la forma de `pendulum.js` como plantilla).
-2. Agrega `<script src="js/simulations/waves.js"></script>` en `index.html`.
-3. En `js/ui.js`, agrega `waves: new WavesSimulation()` al objeto `simulations`,
-   y un bloque `else if (simKey === 'waves') {...}` en `renderControls` y `updateInfoCard`.
-4. Cambia el botón bloqueado de "Ondas" en el sidebar de `index.html` de
-   `class="sim-tab-btn locked" disabled` a `class="sim-tab-btn" data-sim="waves"`.
+Luego abre `http://localhost:8000`.
 
-## Cambios de esta revisión
+## Cómo ampliar el proyecto
 
-- Arreglado: el canvas se distorsionaba progresivamente cada vez que se
-  redimensionaba la ventana (el `scale` de alta resolución se acumulaba en
-  vez de resetearse).
-- Arreglado: la etiqueta "Vectores" mostraba código LaTeX sin renderizar.
-- Agregado: sección "Próximamente" en el menú lateral para los módulos futuros.
+Cada simulación vive en su propio archivo dentro de `js/simulations/`.
+Para añadir una nueva, sigue este patrón:
+
+1. Crea una nueva clase con los métodos `reset()`, `update(dt)` y `draw(engine)`.
+2. Añade el script en `index.html` antes de `js/ui.js`.
+3. Registra la simulación en `UIController` dentro de `js/ui.js`.
+4. Añade su configuración visual y sus textos de ayuda.
+
+## Mejora incluida en esta revisión
+
+- Se normalizó la estructura de carpetas para que coincida con la referencia del `index.html`.
+- Se añadió la simulación faltante de colisiones 2D.
+- Se documentó la estructura del proyecto y la forma de ejecutarlo.
+- Se dejó la base lista para seguir ampliando módulos con una organización consistente.
