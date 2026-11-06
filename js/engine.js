@@ -194,6 +194,28 @@ class PhysicsEngine {
     ctx.fill();
     ctx.restore();
   }
+
+  drawTrail(points, color, lineWidth = 2, maxAlpha = 0.7) {
+    if (!this.showTrail || points.length < 2) return;
+
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    for (let i = 1; i < points.length; i++) {
+      const progress = i / (points.length - 1);
+      ctx.globalAlpha = maxAlpha * progress * progress;
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(this.toScreenX(points[i - 1].x), this.toScreenY(points[i - 1].y));
+      ctx.lineTo(this.toScreenX(points[i].x), this.toScreenY(points[i].y));
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
   
   toScreenX(x) {
     return this.originX + x * this.scale;

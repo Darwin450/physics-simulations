@@ -65,20 +65,7 @@ class OrbitsSimulation {
     
     // Dibujar Planetas y Rastro Orbitatorio
     for (let p of this.planets) {
-      if (engine.showTrail && p.trail.length > 1) {
-        ctx.save();
-        ctx.strokeStyle = p.color;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        for (let i = 0; i < p.trail.length; i++) {
-          const px = engine.toScreenX(p.trail[i].x);
-          const py = engine.toScreenY(p.trail[i].y);
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-        ctx.restore();
-      }
+      engine.drawTrail(p.trail, p.color, 1.7, 0.65);
       
       const px = engine.toScreenX(p.x);
       const py = engine.toScreenY(p.y);

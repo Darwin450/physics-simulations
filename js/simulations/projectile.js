@@ -88,21 +88,7 @@ class ProjectileSimulation {
     ctx.restore();
     
     // Dibujar Rastro (Trail)
-    if (engine.showTrail && this.trail.length > 1) {
-      ctx.save();
-      ctx.strokeStyle = 'rgba(0, 243, 255, 0.5)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      for (let i = 0; i < this.trail.length; i++) {
-        const px = engine.toScreenX(this.trail[i].x);
-        const py = engine.toScreenY(this.trail[i].y);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-      ctx.restore();
-    }
+    engine.drawTrail(this.trail, '#00f3ff', 2.2, 0.72);
     
     // Dibujar Cañón
     const cannonPx = engine.toScreenX(0);

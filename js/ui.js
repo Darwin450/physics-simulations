@@ -181,24 +181,39 @@ class UIController {
   addSlider(label, min, max, val, unit, onChange) {
     const div = document.createElement('div');
     div.className = 'control-group';
-    const id = `slider_${Math.random().toString(36).substr(2, 5)}`;
-    
-    div.innerHTML = `
-      <div class="label-row">
-        <span>${label}</span>
-        <span class="val-badge" id="${id}_val">${val} ${unit}</span>
-      </div>
-      <input type="range" id="${id}" min="${min}" max="${max}" step="${(max - min) / 100}" value="${val}">
-    `;
-    
+
+    const id = `slider_${Math.random().toString(36).slice(2, 7)}`;
+    const labelRow = document.createElement('div');
+    labelRow.className = 'label-row';
+
+    const labelText = document.createElement('label');
+    labelText.htmlFor = id;
+    labelText.textContent = label;
+
+    const badge = document.createElement('output');
+    badge.className = 'val-badge';
+    badge.htmlFor = id;
+    badge.textContent = `${Number(val).toFixed(1)} ${unit}`;
+
+    const input = document.createElement('input');
+    input.type = 'range';
+    input.id = id;
+    input.min = String(min);
+    input.max = String(max);
+    input.step = String((max - min) / 100);
+    input.value = String(val);
+    input.setAttribute('aria-label', label);
+
+    labelRow.append(labelText, badge);
+    div.append(labelRow, input);
     this.controlsContainer.appendChild(div);
-    
-    const input = div.querySelector('input');
-    const badge = div.querySelector('.val-badge');
-    input.addEventListener('input', (e) => {
-      const v = parseFloat(e.target.value);
+
+    input.addEventListener('input', () => {
+      const v = Number(input.value);
       badge.textContent = `${v.toFixed(1)} ${unit}`;
       onChange(v);
+      this.engine.render();
+      this.updateTelemetry();
     });
   }
   

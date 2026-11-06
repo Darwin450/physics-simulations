@@ -100,20 +100,7 @@ class ElectrostaticsSimulation {
     
     // Dibujar Rastro y Partícula de Prueba
     const tp = this.testParticle;
-    if (engine.showTrail && tp.trail.length > 1) {
-      ctx.save();
-      ctx.strokeStyle = '#00ff9d';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (let i = 0; i < tp.trail.length; i++) {
-        const px = engine.toScreenX(tp.trail[i].x);
-        const py = engine.toScreenY(tp.trail[i].y);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-      ctx.restore();
-    }
+    engine.drawTrail(tp.trail, '#00ff9d', 2.2, 0.72);
     
     const tPx = engine.toScreenX(tp.x);
     const tPy = engine.toScreenY(tp.y);
